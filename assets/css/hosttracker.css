@@ -1,0 +1,74 @@
+/* Estilos para o módulo de Acompanhamento de Host */
+
+/* Cabeçalhos da tabela */
+.empresa-header,
+.contratado-header,
+.atual-header,
+.status-header {
+    font-weight: bold;
+    text-align: center;
+    background-color: #0275b8;
+    color: white;
+    padding: 12px;
+}
+
+/* Status OK - Verde */
+.status-ok {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Status Acima do Limite - Vermelho */
+.status-overlimit {
+    background-color: #FFEBEE;
+    color: #C62828;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Quantidade atual quando acima do limite */
+.atual-overlimit {
+    background-color: #FFF3E0;
+    color: #E65100;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Container de informações */
+.info-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #F5F5F5;
+    border-left: 4px solid #0275b8;
+    border-radius: 4px;
+}
+
+.info-text {
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Estilização da tabela */
+table.list-table tbody tr:hover {
+    background-color: #F0F8FF;
+}
+
+/* Células centralizadas */
+table.list-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Título da página */
+.wrapper > h1 {
+    border-bottom: 3px solid #0275b8;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
