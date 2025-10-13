@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2.0,
+  "id": "host_monitoring_tracker",
+  "name": "Comparativo de Host",
+  "version": "1.0.0",
+  "namespace": "HostMonitoringTracker",
+  "description": "Módulo para acompanhar a quantidade de hosts contratados vs monitorados por empresa",
+  "author": "Danilo Santos ",
+  "actions": {
+    "hosttracker.view": {
+      "class": "HostTrackerView",
+      "view": "module.hosttracker.view"
+    },
+    "hosttracker.edit": {
+      "class": "HostTrackerEdit",
+      "view": "module.hosttracker.edit"
+    },
+    "hosttracker.pdf": {
+      "class": "HostTrackerPdf"
+    }
+  },
+  "assets": {
+    "css": ["hosttracker.css"],
+    "js": ["hosttracker.js"]
+  }
+}
