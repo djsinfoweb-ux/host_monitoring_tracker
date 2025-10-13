@@ -195,8 +195,8 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 ## 👤 Autor
 
 **Seu Nome**
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
-- Email: seu.email@exemplo.com
+- GitHub: [https://github.com/djsinfoweb-ux)]
+- Email: djsinfoweb.com.br
 
 ## 🙏 Agradecimentos
 
