@@ -1,72 +1,186 @@
-/* Estilos para o módulo de Acompanhamento de Host */
+/* Host Monitoring Tracker - versão 1.2.0 */
 
-/* Cabeçalhos da tabela */
-.empresa-header,
-.contratado-header,
-.atual-header,
-.status-header {
-    font-weight: bold;
-    text-align: center;
-    background-color: #0275b8;
-    color: white;
-    padding: 12px;
+.hosttracker-hierarchy-help {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    padding: 8px 10px;
+    border-left: 3px solid #0275b8;
+    border-radius: 3px;
+    font-size: 13px;
 }
 
-/* Status OK - Verde */
+body:not([data-theme="dark"]):not([data-theme="hc-dark"]) .hosttracker-hierarchy-help {
+    background: #f3f8fc;
+    color: #333;
+}
+
+body[data-theme="dark"] .hosttracker-hierarchy-help,
+body[data-theme="hc-dark"] .hosttracker-hierarchy-help {
+    background: #252b30;
+    color: #e0e0e0;
+}
+
+.hosttracker-help-icon {
+    color: #0275b8;
+    font-weight: bold;
+}
+
+.hosttracker-hierarchy-table {
+    width: 100%;
+}
+
+.hosttracker-hierarchy-table td {
+    vertical-align: middle;
+}
+
+.hosttracker-hierarchy-table .hosttracker-number-cell,
+.hosttracker-hierarchy-table .hosttracker-status-cell {
+    text-align: center;
+}
+
+.hosttracker-company-cell {
+    text-align: left !important;
+}
+
+.hosttracker-name-content {
+    display: flex;
+    align-items: center;
+    min-height: 26px;
+    gap: 4px;
+}
+
+.hosttracker-group-name {
+    overflow-wrap: anywhere;
+}
+
+.hosttracker-toggle,
+.hosttracker-toggle-spacer {
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.hosttracker-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    color: #0275b8;
+}
+
+.hosttracker-toggle:hover,
+.hosttracker-toggle:focus-visible {
+    background: rgba(2, 117, 184, 0.12);
+    outline: 2px solid transparent;
+}
+
+.hosttracker-caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 7px solid currentColor;
+    transform: rotate(90deg);
+    transition: transform 120ms ease-in-out;
+}
+
+.hosttracker-toggle[aria-expanded="false"] .hosttracker-caret {
+    transform: rotate(0deg);
+}
+
+.hosttracker-hierarchy-table tr[hidden] {
+    display: none !important;
+}
+
+.hosttracker-parent-row > td {
+    font-weight: 600;
+}
+
+body:not([data-theme="dark"]):not([data-theme="hc-dark"])
+.hosttracker-hierarchy-table .hosttracker-parent-row > td {
+    background-color: #eef6fc;
+}
+
+body[data-theme="dark"] .hosttracker-hierarchy-table .hosttracker-parent-row > td,
+body[data-theme="hc-dark"] .hosttracker-hierarchy-table .hosttracker-parent-row > td {
+    background-color: #263640;
+}
+
+body:not([data-theme="dark"]):not([data-theme="hc-dark"])
+.hosttracker-hierarchy-table tbody tr:hover > td {
+    background-color: #f0f8ff;
+}
+
+body[data-theme="dark"] .hosttracker-hierarchy-table tbody tr:hover > td,
+body[data-theme="hc-dark"] .hosttracker-hierarchy-table tbody tr:hover > td {
+    background-color: #343d43;
+}
+
 .status-ok {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-    font-weight: bold;
-    text-align: center;
-    padding: 8px;
-    border-radius: 4px;
+    color: #2e7d32;
+    font-weight: 700;
 }
 
-/* Status Acima do Limite - Vermelho */
-.status-overlimit {
-    background-color: #FFEBEE;
-    color: #C62828;
-    font-weight: bold;
-    text-align: center;
-    padding: 8px;
-    border-radius: 4px;
-}
-
-/* Quantidade atual quando acima do limite */
+.status-overlimit,
 .atual-overlimit {
-    background-color: #FFF3E0;
-    color: #E65100;
-    font-weight: bold;
-    text-align: center;
+    color: #c62828;
+    font-weight: 700;
 }
 
-/* Container de informações */
+body[data-theme="dark"] .status-ok,
+body[data-theme="hc-dark"] .status-ok {
+    color: #81c784;
+}
+
+body[data-theme="dark"] .status-overlimit,
+body[data-theme="hc-dark"] .status-overlimit,
+body[data-theme="dark"] .atual-overlimit,
+body[data-theme="hc-dark"] .atual-overlimit {
+    color: #ef9a9a;
+}
+
 .info-container {
     margin-top: 20px;
-    padding: 15px;
-    background-color: #F5F5F5;
+    padding: 12px 15px;
     border-left: 4px solid #0275b8;
     border-radius: 4px;
 }
 
-.info-text {
-    font-size: 14px;
+body:not([data-theme="dark"]):not([data-theme="hc-dark"]) .info-container {
+    background-color: #f5f5f5;
     color: #333;
-    font-weight: 600;
 }
 
-/* Estilização da tabela */
-table.list-table tbody tr:hover {
-    background-color: #F0F8FF;
+body[data-theme="dark"] .info-container,
+body[data-theme="hc-dark"] .info-container {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
 }
 
-/* Células centralizadas */
-table.list-table td {
-    text-align: center;
-    vertical-align: middle;
+.hosttracker-summary {
+    line-height: 1.5;
 }
 
-/* Título da página */
+.hosttracker-form-buttons {
+    margin-top: 15px;
+}
+
+.hosttracker-info-title {
+    margin-top: 0;
+    color: #0275b8;
+}
+
+.hosttracker-limits-table input[type="number"] {
+    text-align: right;
+}
+
 .wrapper > h1 {
     border-bottom: 3px solid #0275b8;
     padding-bottom: 10px;

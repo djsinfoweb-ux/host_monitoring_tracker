@@ -1,221 +1,181 @@
-# 📊 Zabbix Host Monitoring Tracker
+# Módulo de Acompanhamento de Host - Zabbix
 
-![Zabbix](https://img.shields.io/badge/Zabbix-6.0%2B-red)
-![PHP](https://img.shields.io/badge/PHP-7.4%2B-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Descrição
 
-Módulo para Zabbix que permite acompanhar e gerenciar limites de hosts contratados por empresa/grupo.
+Módulo frontend para controlar a quantidade de hosts monitorados por grupo/empresa e comparar com o limite contratado.
 
-## 🎯 Funcionalidades
+A partir da versão **1.2.0**, grupos que seguem uma nomenclatura hierárquica passam a ser exibidos em formato pai/filho recolhível.
 
-- ✅ **Visualização de Status** - Acompanhe em tempo real quantos hosts cada empresa está monitorando
-- ✅ **Comparação com Limites** - Compare automaticamente com o limite contratado
-- ✅ **Alertas Visuais** - Status colorido (verde/vermelho) indica se está dentro ou acima do limite
-- ✅ **Gerenciamento Fácil** - Interface web para configurar limites por grupo
-- ✅ **Exportação PDF** - Gere relatórios em PDF para apresentações
-- ✅ **Persistência de Dados** - Configurações salvas em arquivo JSON
+Exemplo:
 
-## 📸 Screenshots
-
-### Tela Principal
-![Tela Principal](docs/images/main-view.png)
-
-### Gerenciar Limites
-![Gerenciar Limites](docs/images/edit-limits.png)
-
-### Relatório PDF
-![PDF](docs/images/pdf-report.png)
-
-## 🚀 Instalação Rápida
-
-### Pré-requisitos
-
-- Zabbix 6.0+ ou 7.0+
-- PHP 7.4+ com php-fpm
-- Nginx ou Apache
-- Acesso SSH ao servidor frontend
-
-### Instalação
-
-```bash
-# 1. Clonar repositório
-cd /usr/share/zabbix/modules
-sudo git clone https://github.com/seu-usuario/zabbix-host-tracker.git host_monitoring_tracker
-
-# 2. Ajustar permissões
-sudo chown -R nginx:nginx host_monitoring_tracker
-sudo chmod -R 755 host_monitoring_tracker
-sudo chmod 666 host_monitoring_tracker/limits.json
-
-# 3. Reiniciar serviços
-sudo systemctl restart nginx php-fpm
-
-# 4. Ativar no Zabbix
-# Administração → Geral → Módulos → Scan directory → Enable
+```text
+DJSINFOWEB
+├── DJSINFOWEB/APPS
+└── DJSINFOWEB/VMs
 ```
 
-Para instalação detalhada, consulte [INSTALL.md](INSTALL.md)
+O relacionamento só é criado quando o grupo pai realmente existe no Zabbix. Portanto, um nome contendo `/` não será agrupado incorretamente caso o prefixo não exista como grupo.
 
-## 📖 Como Usar
+## Recursos
 
-### 1. Acessar o Módulo
+- Visualização de hosts monitorados versus limite contratado
+- Status **OK** ou **Acima do Limite**
+- Hierarquia pai/filho com abertura e fechamento dos subgrupos
+- Suporte a vários níveis de hierarquia
+- Estado recolhido salvo no navegador
+- Gerenciamento de limites também em formato hierárquico
+- Relatório para impressão/PDF com identação dos subgrupos
+- Compatibilidade visual com temas claro e escuro
+- Botão de gerenciamento restrito a Admin e Super Admin
+- Leitura otimizada da contagem de hosts, com fallback para instalações incompatíveis
+- Gravação atômica do `limits.json`
 
-No menu do Zabbix: **Monitoring → Acompanhamento de Host**
+## Regra para criar a hierarquia
 
-### 2. Configurar Limites
+O módulo utiliza o caractere `/` no nome dos grupos.
 
-1. Clique em **"Gerenciar Limites"**
-2. Defina o limite contratado para cada grupo/empresa
-3. Clique em **"Salvar Configurações"**
+Para este cenário:
 
-### 3. Visualizar Status
+```text
+DJSINFOWEB
+DJSINFOWEB/APPS
+DJSINFOWEB/VMs
+```
 
-- **Verde (OK)**: Dentro do limite
-- **Vermelho (Acima do Limite)**: Excedeu o contratado
+`DJSINFOWEB` será o pai e os outros dois serão filhos.
 
-### 4. Gerar PDF
+Também funciona com mais níveis:
 
-Clique em **"Gerar PDF"** para exportar relatório completo
+```text
+EMPRESA
+EMPRESA/APPS
+EMPRESA/APPS/PRODUCAO
+```
 
-## ⚙️ Configuração
+Se existir apenas `EMPRESA/APPS`, mas o grupo `EMPRESA` não existir, o grupo será exibido como principal.
 
-### Método 1: Via Interface (Recomendado)
+## Instalação
 
-Use o botão "Gerenciar Limites" na interface do módulo.
-
-### Método 2: Via Macros do Zabbix
-
-Para cada grupo de hosts:
-
-1. **Configuração → Grupos de hosts**
-2. Selecione o grupo
-3. Aba **Macros**
-4. Adicione: `{$HOST_LIMIT}` = `100`
-
-### Método 3: Editar JSON Manualmente
+1. Copie a pasta para o diretório de módulos do frontend Zabbix:
 
 ```bash
-sudo nano /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
+sudo cp -r host_monitoring_tracker /usr/share/zabbix/modules/
 ```
+
+Em algumas instalações o caminho pode ser `/usr/share/zabbix/ui/modules/`.
+
+2. Ajuste proprietário e permissões. Em Debian/Ubuntu com Apache:
+
+```bash
+sudo chown -R www-data:www-data /usr/share/zabbix/modules/host_monitoring_tracker
+sudo chmod 666 /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
+```
+
+Em RHEL/AlmaLinux/Oracle Linux, o usuário do frontend costuma ser `apache`:
+
+```bash
+sudo chown -R apache:apache /usr/share/zabbix/modules/host_monitoring_tracker
+sudo chmod 666 /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
+```
+
+3. No Zabbix:
+
+- Acesse **Administration → General → Modules**
+- Clique em **Scan directory**
+- Habilite **Acompanhamento de Host**
+- Abra **Monitoring → Acompanhamento de Host**
+
+## Atualização da versão 1.1.0 para 1.2.0
+
+Faça backup dos limites antes de substituir a pasta:
+
+```bash
+sudo cp /usr/share/zabbix/modules/host_monitoring_tracker/limits.json /tmp/limits.json.backup
+sudo rm -rf /usr/share/zabbix/modules/host_monitoring_tracker
+sudo cp -r host_monitoring_tracker /usr/share/zabbix/modules/
+sudo cp /tmp/limits.json.backup /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
+sudo chmod 666 /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
+```
+
+Depois:
+
+- Confirme que o módulo está habilitado
+- Atualize o navegador com `Ctrl + F5`
+- Se necessário, desabilite e habilite novamente o módulo
+
+## Gerenciamento dos limites
+
+1. Acesse **Monitoring → Acompanhamento de Host**
+2. Clique em **Gerenciar Limites**
+3. Abra a empresa pai para visualizar os filhos
+4. Configure um limite individual para o pai e para cada subgrupo
+5. Clique em **Salvar Configurações**
+
+Os limites permanecem individuais. O valor do grupo pai não é somado automaticamente com os filhos.
+
+## Formato do limits.json
 
 ```json
 {
-    "2": "100",
-    "5": "50",
-    "7": "200"
+  "44": 100,
+  "45": 100,
+  "46": 100
 }
 ```
 
-## 🏗️ Estrutura do Projeto
+A chave é o `groupid` do Zabbix e o valor é o limite contratado.
 
-```
+## Estrutura
+
+```text
 host_monitoring_tracker/
-├── manifest.json                 # Manifesto do módulo
-├── Module.php                    # Classe principal
-├── limits.json                   # Configurações de limites
+├── Module.php
+├── manifest.json
+├── limits.json
+├── includes/
+│   └── HostTrackerDataService.php
 ├── actions/
-│   ├── HostTrackerView.php      # Visualização principal
-│   ├── HostTrackerEdit.php      # Gerenciamento de limites
-│   └── HostTrackerPdf.php       # Geração de PDF
+│   ├── HostTrackerView.php
+│   ├── HostTrackerEdit.php
+│   └── HostTrackerPdf.php
 ├── views/
-│   ├── module.hosttracker.view.php  # Interface principal
-│   └── module.hosttracker.edit.php  # Interface de edição
+│   ├── module.hosttracker.view.php
+│   └── module.hosttracker.edit.php
 └── assets/
-    ├── css/
-    │   └── hosttracker.css      # Estilos personalizados
-    └── js/
-        └── hosttracker.js       # Scripts JavaScript
+    ├── css/hosttracker.css
+    └── js/hosttracker.js
 ```
 
-## 🔧 Compatibilidade
+## Solução de problemas
 
-| Zabbix Version | Status | Notas |
-|----------------|--------|-------|
-| 7.0 | ✅ Testado | Totalmente compatível |
-| 6.4 LTS | ✅ Testado | Totalmente compatível |
-| 6.0 LTS | ✅ Testado | Totalmente compatível |
-| 5.x | ⚠️ Parcial | Requer ajustes |
-| 4.x | ❌ Não suportado | Sistema de módulos diferente |
+### A seta não aparece
 
-## 🐛 Solução de Problemas
+- Confirme que o grupo pai existe exatamente como grupo no Zabbix
+- Use `/` para separar os níveis
+- Atualize o navegador com `Ctrl + F5`
 
-### Módulo não aparece na lista
+### O filho não ficou abaixo do pai
 
-```bash
-# Verificar permissões
-ls -la /usr/share/zabbix/modules/host_monitoring_tracker/
+Exemplo correto:
 
-# Verificar logs
-sudo tail -50 /var/log/nginx/error.log
+```text
+DJSINFOWEB
+DJSINFOWEB/APPS
 ```
 
-### Erro ao salvar configurações
+O módulo ignora espaços ao redor da barra, portanto `WEB / EQUIPE DIGITAL` pode ser associado ao grupo `WEB`.
+
+### Erro ao salvar limites
 
 ```bash
-# Verificar permissões do limits.json
+ls -l /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
 sudo chmod 666 /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
-sudo chown nginx:nginx /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
 ```
 
-### Página em branco
+Também verifique se o diretório do módulo permite que o usuário do frontend crie o arquivo temporário usado na gravação atômica.
 
-```bash
-# Verificar sintaxe PHP
-find /usr -name php -type f 2>/dev/null | head -n 1 | xargs -I {} {} -l actions/HostTrackerView.php
-```
+## Versões
 
-Para mais problemas, consulte [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
-
-1. Faça um Fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um Pull Request
-
-## 📝 Changelog
-
-### [1.0.0] - 2025-10-12
-
-#### Adicionado
-- Visualização de hosts monitorados por grupo
-- Comparação com limites contratados
-- Interface de gerenciamento de limites
-- Exportação para PDF
-- Status visual (verde/vermelho)
-- Persistência em arquivo JSON
-
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 👤 Autor
-
-**Seu Nome**
-- GitHub: [https://github.com/djsinfoweb-ux)]
-- Email: djsinfoweb.com.br
-
-## 🙏 Agradecimentos
-
-- Comunidade Zabbix
-- Contribuidores do projeto
-- [Zabbix SIA](https://www.zabbix.com/)
-
-## 📞 Suporte
-
-- 📖 [Documentação Completa](docs/)
-- 🐛 [Reportar Bug](https://github.com/seu-usuario/zabbix-host-tracker/issues)
-- 💬 [Discussões](https://github.com/seu-usuario/zabbix-host-tracker/discussions)
-
-## ⭐ Star History
-
-Se este projeto foi útil, considere dar uma estrela!
-
-[![Star History Chart](https://api.star-history.com/svg?repos=seu-usuario/zabbix-host-tracker&type=Date)](https://star-history.com/#seu-usuario/zabbix-host-tracker&Date)
-
----
-
-**Desenvolvido com ❤️ para a comunidade Zabbix**
+- **1.2.0**: hierarquia pai/filho, recolhimento, PDF hierárquico, otimização de consultas e melhorias de persistência
+- **1.1.0**: temas e controle de acesso
+- **1.0.0**: versão inicial
