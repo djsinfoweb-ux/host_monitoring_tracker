@@ -4,7 +4,7 @@
 
 Módulo frontend para controlar a quantidade de hosts monitorados por grupo/empresa e comparar com o limite contratado.
 
-A partir da versão **1.2.0**, grupos que seguem uma nomenclatura hierárquica passam a ser exibidos em formato pai/filho recolhível.
+A partir da versão **1.2.0**, grupos que seguem uma nomenclatura hierárquica passam a ser exibidos em formato pai/filho recolhível. Na versão **1.3.0**, a quantidade exibida no grupo pai passou a ser consolidada automaticamente pela soma dos grupos filhos.
 
 Exemplo:
 
@@ -21,6 +21,7 @@ O relacionamento só é criado quando o grupo pai realmente existe no Zabbix. Po
 - Visualização de hosts monitorados versus limite contratado
 - Status **OK** ou **Acima do Limite**
 - Hierarquia pai/filho com abertura e fechamento dos subgrupos
+- Consolidação automática da quantidade de hosts no grupo pai
 - Suporte a vários níveis de hierarquia
 - Estado recolhido salvo no navegador
 - Gerenciamento de limites também em formato hierárquico
@@ -54,6 +55,28 @@ EMPRESA/APPS/PRODUCAO
 
 Se existir apenas `EMPRESA/APPS`, mas o grupo `EMPRESA` não existir, o grupo será exibido como principal.
 
+## Regra de contabilização da versão 1.3.0
+
+Quando um grupo possui filhos, a coluna **Atual** do pai deixa de mostrar a contagem direta daquele grupo e passa a mostrar a soma dos subgrupos.
+
+Exemplo:
+
+```text
+DJSINFOWEB = 9
+├── DJSINFOWEB/APPS = 4
+└── DJSINFOWEB/VMs = 5
+```
+
+O cálculo é:
+
+```text
+4 + 5 = 9
+```
+
+A consolidação é recursiva e também funciona com vários níveis. Quando um grupo possui filhos, hosts associados diretamente ao próprio pai não entram no total consolidado; o pai funciona como agrupador da estrutura abaixo dele. Grupos sem filhos continuam exibindo sua contagem direta.
+
+Cada grupo mantém seu próprio limite contratado. Portanto, o status do pai é calculado comparando o total consolidado dos filhos com o limite configurado para o pai.
+
 ## Instalação
 
 1. Copie a pasta para o diretório de módulos do frontend Zabbix:
@@ -85,7 +108,7 @@ sudo chmod 666 /usr/share/zabbix/modules/host_monitoring_tracker/limits.json
 - Habilite **Acompanhamento de Host**
 - Abra **Monitoring → Acompanhamento de Host**
 
-## Atualização da versão 1.1.0 para 1.2.0
+## Atualização para a versão 1.3.0
 
 Faça backup dos limites antes de substituir a pasta:
 
@@ -111,7 +134,7 @@ Depois:
 4. Configure um limite individual para o pai e para cada subgrupo
 5. Clique em **Salvar Configurações**
 
-Os limites permanecem individuais. O valor do grupo pai não é somado automaticamente com os filhos.
+Os limites permanecem individuais. A quantidade monitorada do grupo pai é calculada automaticamente pela soma dos filhos, mas o limite contratado do pai continua sendo configurado separadamente.
 
 ## Formato do limits.json
 
@@ -176,6 +199,7 @@ Também verifique se o diretório do módulo permite que o usuário do frontend 
 
 ## Versões
 
+- **1.3.0**: grupo pai contabiliza automaticamente a soma dos hosts dos subgrupos
 - **1.2.0**: hierarquia pai/filho, recolhimento, PDF hierárquico, otimização de consultas e melhorias de persistência
 - **1.1.0**: temas e controle de acesso
 - **1.0.0**: versão inicial

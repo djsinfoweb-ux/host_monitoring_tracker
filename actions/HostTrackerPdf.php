@@ -137,7 +137,8 @@ class HostTrackerPdf extends CController {
         <strong>Data de geração:</strong> ' . htmlspecialchars($generatedAt, ENT_QUOTES, 'UTF-8') . '<br>
         <strong>Empresas/grupos principais:</strong> ' . $rootGroups . '<br>
         <strong>Subgrupos:</strong> ' . $childGroups . '<br>
-        <strong>Total de grupos:</strong> ' . $totalGroups . '
+        <strong>Total de grupos:</strong> ' . $totalGroups . '<br>
+        <strong>Regra de consolidação:</strong> grupos pai exibem a soma dos hosts de seus subgrupos.
     </div>
 
     <button class="no-print print-button" onclick="window.print()">

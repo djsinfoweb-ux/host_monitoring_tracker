@@ -207,6 +207,69 @@ final class HostTrackerDataService {
         }
         unset($childIds);
 
+        /*
+         * Nos grupos pai, a quantidade atual representa a soma dos grupos
+         * filhos. Exemplo: EMPRESA/APPS = 4 e EMPRESA/VMs = 5; logo EMPRESA = 9.
+         *
+         * A soma é recursiva para suportar múltiplos níveis. Hosts vinculados
+         * diretamente a um grupo que possui filhos ficam registrados em
+         * direct_current, mas não são somados ao total do pai. Assim, o grupo
+         * pai funciona como consolidador da estrutura abaixo dele.
+         */
+        $calculateAggregatedCurrent = static function ($groupId) use (
+            &$calculateAggregatedCurrent,
+            &$rowsById,
+            &$childrenByParent
+        ) {
+            $directCurrent = isset($rowsById[$groupId]['current'])
+                ? max(0, (int) $rowsById[$groupId]['current'])
+                : (
+                    isset($rowsById[$groupId]['hosts_count'])
+                        ? max(0, (int) $rowsById[$groupId]['hosts_count'])
+                        : 0
+                );
+
+            $rowsById[$groupId]['direct_current'] = $directCurrent;
+            $rowsById[$groupId]['direct_hosts_count'] = $directCurrent;
+
+            if (!empty($childrenByParent[$groupId])) {
+                $aggregatedCurrent = 0;
+
+                foreach ($childrenByParent[$groupId] as $childId) {
+                    $aggregatedCurrent += $calculateAggregatedCurrent($childId);
+                }
+
+                $rowsById[$groupId]['current'] = $aggregatedCurrent;
+                $rowsById[$groupId]['hosts_count'] = $aggregatedCurrent;
+                $rowsById[$groupId]['is_aggregated'] = true;
+            }
+            else {
+                $rowsById[$groupId]['current'] = $directCurrent;
+                $rowsById[$groupId]['hosts_count'] = $directCurrent;
+                $rowsById[$groupId]['is_aggregated'] = false;
+            }
+
+            $contracted = isset($rowsById[$groupId]['contracted'])
+                ? max(0, (int) $rowsById[$groupId]['contracted'])
+                : (
+                    isset($rowsById[$groupId]['current_limit'])
+                        ? max(0, (int) $rowsById[$groupId]['current_limit'])
+                        : self::DEFAULT_LIMIT
+                );
+
+            $rowsById[$groupId]['contracted'] = $contracted;
+            $rowsById[$groupId]['current_limit'] = $contracted;
+            $rowsById[$groupId]['status'] = (
+                $rowsById[$groupId]['current'] > $contracted
+            ) ? 'Acima do Limite' : 'OK';
+
+            return $rowsById[$groupId]['current'];
+        };
+
+        foreach ($rootIds as $rootId) {
+            $calculateAggregatedCurrent($rootId);
+        }
+
         $flattenedRows = [];
         $appendBranch = static function ($groupId, $depth) use (
             &$appendBranch,

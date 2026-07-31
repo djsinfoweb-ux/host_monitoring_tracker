@@ -24,7 +24,7 @@ $helpText = (new CDiv())
     ->addClass('hosttracker-hierarchy-help')
     ->addItem([
         (new CSpan('▾'))->addClass('hosttracker-help-icon'),
-        _('Clique na seta ao lado de uma empresa para abrir ou fechar seus subgrupos.')
+        _('Clique na seta para abrir ou fechar os subgrupos. No grupo pai, o valor Atual é a soma dos grupos filhos.')
     ]);
 
 $widget->addItem($helpText);
@@ -89,6 +89,13 @@ foreach ($data['companies'] as $company) {
 
     $currentSpan = (new CSpan((string) $company['current']))
         ->addClass('hosttracker-current-value');
+
+    if (!empty($company['is_aggregated'])) {
+        $currentSpan->setAttribute(
+            'title',
+            _('Total calculado pela soma dos hosts dos subgrupos')
+        );
+    }
 
     if ($company['status'] !== 'OK') {
         $currentSpan->addClass('atual-overlimit');

@@ -4,6 +4,36 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ---
 
+## [1.3.0] - 2026-07-30
+
+### Adicionado
+
+- Consolidação automática da quantidade de hosts nos grupos pai
+- Soma recursiva para hierarquias com vários níveis
+- Campo interno `direct_current` para preservar a contagem direta original
+- Identificação interna `is_aggregated` para diferenciar linhas consolidadas
+- Tooltips informando quando a quantidade foi calculada pelos subgrupos
+
+### Modificado
+
+- A coluna **Atual** do grupo pai agora mostra a soma dos grupos filhos
+- A coluna **Hosts Monitorados** na gestão de limites usa o total consolidado
+- O status do grupo pai é recalculado com o total consolidado e o limite próprio do pai
+- O relatório para impressão/PDF apresenta a mesma regra de consolidação
+- Documentação e `manifest.json` atualizados para a versão 1.3.0
+
+### Regra de cálculo
+
+```text
+DJSINFOWEB/APPS = 4
+DJSINFOWEB/VMs  = 5
+DJSINFOWEB      = 9
+```
+
+Hosts associados diretamente a um grupo que possui filhos não entram no total do pai. O pai funciona como consolidador dos subgrupos.
+
+---
+
 ## [1.2.0] - 2026-07-28
 
 ### Adicionado
@@ -139,7 +169,7 @@ O CSS usa o atributo `data-theme` do elemento `<body>` para detectar o tema:
 
 ## 🔮 Planejamento Futuro
 
-### Versão 1.3.0 (Planejada)
+### Versão 1.4.0 (Planejada)
 - [ ] Gráficos de evolução de hosts ao longo do tempo
 - [ ] Alertas por email quando limites forem ultrapassados
 - [ ] Dashboard com estatísticas agregadas
@@ -159,6 +189,7 @@ O CSS usa o atributo `data-theme` do elemento `<body>` para detectar o tema:
 
 | Versão | Data       | Arquivos Modificados | Novos Arquivos | Linhas Adicionadas | Linhas Removidas |
 |--------|------------|---------------------|----------------|-------------------|------------------|
+| 1.3.0  | 2026-07-30 | 6                   | 2              | -                 | -                |
 | 1.2.0  | 2026-07-28 | 8                   | 2              | -                 | -                |
 | 1.1.0  | 2025-01-07 | 5                   | 3              | ~200              | ~50              |
 | 1.0.0  | -          | -                   | 12             | ~800              | 0                |

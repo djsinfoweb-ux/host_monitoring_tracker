@@ -12,7 +12,7 @@ $widget->addItem(
         ->addClass('hosttracker-hierarchy-help')
         ->addItem([
             (new CSpan('▾'))->addClass('hosttracker-help-icon'),
-            _('Clique na seta para abrir ou fechar os subgrupos da empresa.')
+            _('Clique na seta para abrir ou fechar os subgrupos. Nos grupos pai, Hosts Monitorados é a soma dos filhos.')
         ])
 );
 
@@ -81,9 +81,16 @@ foreach ($data['groups'] as $group) {
     );
 
     $hostsStatus = $count > $limit ? 'status-overlimit' : 'status-ok';
-    $hostsCell = (new CCol(
-        (new CSpan((string) $count))->addClass($hostsStatus)
-    ))->addClass('hosttracker-number-cell');
+    $hostsValue = (new CSpan((string) $count))->addClass($hostsStatus);
+
+    if (!empty($group['is_aggregated'])) {
+        $hostsValue->setAttribute(
+            'title',
+            _('Total calculado pela soma dos hosts dos subgrupos')
+        );
+    }
+
+    $hostsCell = (new CCol($hostsValue))->addClass('hosttracker-number-cell');
 
     $row = (new CRow([
         (new CCol($nameContent))
@@ -136,6 +143,8 @@ $help = (new CDiv())
         (new CTag('h4', true, _('Informações:')))->addClass('hosttracker-info-title'),
         (new CList([
             _('Os limites continuam individuais para o grupo pai e para cada subgrupo.'),
+            _('A quantidade do grupo pai é calculada pela soma dos seus subgrupos.'),
+            _('Hosts vinculados diretamente ao pai não entram na soma quando ele possui filhos.'),
             _('Grupos em vermelho estão acima do limite contratado.'),
             _('As configurações são salvas no arquivo limits.json do módulo.'),
             sprintf(_('Total de grupos configuráveis: %1$d'), $totalGroups)
